@@ -1,0 +1,163 @@
+graph TB
+    subgraph "User Layer"
+        U1[Admin User]
+        U2[Regular User]
+        U3[Viewer User]
+    end
+    
+    subgraph "Web Interface"
+        WI1[Setup Wizard]
+        WI2[Login/Auth]
+        WI3[Dashboard]
+        WI4[Email Management]
+        WI5[Provider Config]
+        WI6[AI Model Config]
+        WI7[Analytics]
+        WI8[Admin Panel]
+    end
+    
+    subgraph "PHP Application Core"
+        AC1[Authentication Controller]
+        AC2[Email Controller]
+        AC3[Provider Controller]
+        AC4[AI Controller]
+        AC5[Admin Controller]
+        AC6[API Controller]
+    end
+    
+    subgraph "Business Logic Layer"
+        BL1[User Management]
+        BL2[Email Processing Engine]
+        BL3[Multi-AI Ensemble]
+        BL4[Rule Engine]
+        BL5[Provider Manager]
+        BL6[Analytics Engine]
+    end
+    
+    subgraph "Email Providers"
+        EP1[Gmail IMAP/SMTP]
+        EP2[Outlook OAuth]
+        EP3[Yahoo IMAP]
+        EP4[ProtonMail API]
+        EP5[Custom IMAP/SMTP]
+        EP6[Mailgun API]
+        EP7[SendGrid API]
+    end
+    
+    subgraph "AI Providers"
+        AI1[OpenAI GPT-4]
+        AI2[Anthropic Claude]
+        AI3[Google Gemini]
+        AI4[Qwen Models]
+        AI5[Groq LLaMA]
+        AI6[Cohere Command]
+        AI7[Mistral AI]
+        AI8[Together AI]
+    end
+    
+    subgraph "Database Layer"
+        DB1[(MySQL Database)]
+        DB2[Users Table]
+        DB3[Email Providers Table]
+        DB4[AI Providers Table]
+        DB5[Emails Table]
+        DB6[AI Analysis Results]
+        DB7[System Settings]
+    end
+    
+    subgraph "External Services"
+        ES1[SMTP Servers]
+        ES2[OAuth Providers]
+        ES3[Calendar APIs]
+        ES4[CRM Systems]
+        ES5[Webhook Endpoints]
+    end
+    
+    %% User connections
+    U1 --> WI1
+    U1 --> WI8
+    U2 --> WI2
+    U2 --> WI3
+    U3 --> WI7
+    
+    %% Web interface to controllers
+    WI1 --> AC1
+    WI2 --> AC1
+    WI3 --> AC2
+    WI4 --> AC2
+    WI5 --> AC3
+    WI6 --> AC4
+    WI7 --> AC6
+    WI8 --> AC5
+    
+    %% Controllers to business logic
+    AC1 --> BL1
+    AC2 --> BL2
+    AC3 --> BL5
+    AC4 --> BL3
+    AC5 --> BL1
+    AC6 --> BL6
+    
+    %% Business logic connections
+    BL2 --> BL3
+    BL2 --> BL4
+    BL3 --> BL6
+    BL5 --> EP1
+    BL5 --> EP2
+    BL5 --> EP3
+    BL5 --> EP4
+    BL5 --> EP5
+    BL5 --> EP6
+    BL5 --> EP7
+    
+    %% AI ensemble connections
+    BL3 --> AI1
+    BL3 --> AI2
+    BL3 --> AI3
+    BL3 --> AI4
+    BL3 --> AI5
+    BL3 --> AI6
+    BL3 --> AI7
+    BL3 --> AI8
+    
+    %% Database connections
+    BL1 --> DB1
+    BL2 --> DB1
+    BL3 --> DB1
+    BL4 --> DB1
+    BL5 --> DB1
+    BL6 --> DB1
+    
+    DB1 --> DB2
+    DB1 --> DB3
+    DB1 --> DB4
+    DB1 --> DB5
+    DB1 --> DB6
+    DB1 --> DB7
+    
+    %% External service connections
+    EP1 --> ES1
+    EP2 --> ES2
+    BL2 --> ES3
+    BL2 --> ES4
+    BL2 --> ES5
+    
+    %% Styling
+    classDef userClass fill:#e1f5fe
+    classDef webClass fill:#f3e5f5
+    classDef controllerClass fill:#e8f5e8
+    classDef businessClass fill:#fff3e0
+    classDef providerClass fill:#fce4ec
+    classDef aiClass fill:#e0f2f1
+    classDef dbClass fill:#fff8e1
+    classDef externalClass fill:#f1f8e9
+    
+    class U1,U2,U3 userClass
+    class WI1,WI2,WI3,WI4,WI5,WI6,WI7,WI8 webClass
+    class AC1,AC2,AC3,AC4,AC5,AC6 controllerClass
+    class BL1,BL2,BL3,BL4,BL5,BL6 businessClass
+    class EP1,EP2,EP3,EP4,EP5,EP6,EP7 providerClass
+    class AI1,AI2,AI3,AI4,AI5,AI6,AI7,AI8 aiClass
+    class DB1,DB2,DB3,DB4,DB5,DB6,DB7 dbClass
+    class ES1,ES2,ES3,ES4,ES5 externalClass
+

@@ -1,0 +1,87 @@
+# ROTZ Email Butler - Apache Configuration
+
+# Enable URL Rewriting
+RewriteEngine On
+
+# Security Headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https:;"
+
+# Hide sensitive files
+<Files ~ "^\.">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files ~ "composer\.(json|lock)$">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files ~ "\.env$">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Protect config directory
+<Directory "config">
+    Order allow,deny
+    Deny from all
+</Directory>
+
+# Protect includes directory
+<Directory "includes">
+    Order allow,deny
+    Deny from all
+</Directory>
+
+# Protect classes directory
+<Directory "classes">
+    Order allow,deny
+    Deny from all
+</Directory>
+
+# Setup wizard redirect (only if not installed)
+RewriteCond %{REQUEST_URI} !^/setup/
+RewriteCond %{DOCUMENT_ROOT}/config/installed.lock !-f
+RewriteRule ^(.*)$ /setup/ [R=302,L]
+
+# API Routes
+RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+
+# Admin Routes
+RewriteRule ^admin/(.*)$ admin/index.php [QSA,L]
+
+# Main application routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Browser caching
+<IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+</IfModule>
+

@@ -1,0 +1,155 @@
+graph TD
+    A[Email Received] --> B[Extract Email Content]
+    B --> C[Check Enabled AI Providers]
+    C --> D{Any Providers Enabled?}
+    
+    D -->|No| E[Use Basic Rules]
+    D -->|Yes| F[Prepare Analysis Prompt]
+    
+    F --> G[Parallel AI Requests]
+    
+    %% AI Provider Branches
+    G --> H1[OpenAI Request]
+    G --> H2[Anthropic Request]
+    G --> H3[Google Request]
+    G --> H4[Qwen Request]
+    G --> H5[Groq Request]
+    G --> H6[Cohere Request]
+    G --> H7[Mistral Request]
+    G --> H8[Together AI Request]
+    
+    %% Individual AI Processing
+    H1 --> I1{OpenAI Enabled?}
+    H2 --> I2{Anthropic Enabled?}
+    H3 --> I3{Google Enabled?}
+    H4 --> I4{Qwen Enabled?}
+    H5 --> I5{Groq Enabled?}
+    H6 --> I6{Cohere Enabled?}
+    H7 --> I7{Mistral Enabled?}
+    H8 --> I8{Together AI Enabled?}
+    
+    I1 -->|Yes| J1[Call OpenAI API]
+    I1 -->|No| K1[Skip OpenAI]
+    I2 -->|Yes| J2[Call Anthropic API]
+    I2 -->|No| K2[Skip Anthropic]
+    I3 -->|Yes| J3[Call Google API]
+    I3 -->|No| K3[Skip Google]
+    I4 -->|Yes| J4[Call Qwen API]
+    I4 -->|No| K4[Skip Qwen]
+    I5 -->|Yes| J5[Call Groq API]
+    I5 -->|No| K5[Skip Groq]
+    I6 -->|Yes| J6[Call Cohere API]
+    I6 -->|No| K6[Skip Cohere]
+    I7 -->|Yes| J7[Call Mistral API]
+    I7 -->|No| K7[Skip Mistral]
+    I8 -->|Yes| J8[Call Together AI API]
+    I8 -->|No| K8[Skip Together AI]
+    
+    %% API Response Processing
+    J1 --> L1[Parse OpenAI Response]
+    J2 --> L2[Parse Anthropic Response]
+    J3 --> L3[Parse Google Response]
+    J4 --> L4[Parse Qwen Response]
+    J5 --> L5[Parse Groq Response]
+    J6 --> L6[Parse Cohere Response]
+    J7 --> L7[Parse Mistral Response]
+    J8 --> L8[Parse Together AI Response]
+    
+    %% Error Handling
+    L1 --> M1{Success?}
+    L2 --> M2{Success?}
+    L3 --> M3{Success?}
+    L4 --> M4{Success?}
+    L5 --> M5{Success?}
+    L6 --> M6{Success?}
+    L7 --> M7{Success?}
+    L8 --> M8{Success?}
+    
+    M1 -->|Yes| N1[Store OpenAI Result]
+    M1 -->|No| O1[Log OpenAI Error]
+    M2 -->|Yes| N2[Store Anthropic Result]
+    M2 -->|No| O2[Log Anthropic Error]
+    M3 -->|Yes| N3[Store Google Result]
+    M3 -->|No| O3[Log Google Error]
+    M4 -->|Yes| N4[Store Qwen Result]
+    M4 -->|No| O4[Log Qwen Error]
+    M5 -->|Yes| N5[Store Groq Result]
+    M5 -->|No| O5[Log Groq Error]
+    M6 -->|Yes| N6[Store Cohere Result]
+    M6 -->|No| O6[Log Cohere Error]
+    M7 -->|Yes| N7[Store Mistral Result]
+    M7 -->|No| O7[Log Mistral Error]
+    M8 -->|Yes| N8[Store Together AI Result]
+    M8 -->|No| O8[Log Together AI Error]
+    
+    %% Consensus Engine
+    N1 --> P[Consensus Engine]
+    N2 --> P
+    N3 --> P
+    N4 --> P
+    N5 --> P
+    N6 --> P
+    N7 --> P
+    N8 --> P
+    K1 --> P
+    K2 --> P
+    K3 --> P
+    K4 --> P
+    K5 --> P
+    K6 --> P
+    K7 --> P
+    K8 --> P
+    O1 --> P
+    O2 --> P
+    O3 --> P
+    O4 --> P
+    O5 --> P
+    O6 --> P
+    O7 --> P
+    O8 --> P
+    
+    %% Consensus Processing
+    P --> Q[Collect All Results]
+    Q --> R{Any Valid Results?}
+    R -->|No| S[Use Fallback Classification]
+    R -->|Yes| T[Calculate Weighted Scores]
+    
+    T --> U[Category Consensus]
+    T --> V[Priority Consensus]
+    T --> W[Sentiment Consensus]
+    
+    U --> X[Final Category]
+    V --> Y[Final Priority]
+    W --> Z[Final Sentiment]
+    
+    X --> AA[Calculate Overall Confidence]
+    Y --> AA
+    Z --> AA
+    
+    AA --> BB[Generate Summary]
+    BB --> CC[Determine Actions Required]
+    CC --> DD[Store Final Analysis]
+    
+    S --> DD
+    E --> DD
+    
+    DD --> EE[Update Email Record]
+    EE --> FF[Trigger Notifications]
+    FF --> GG[Execute Rules]
+    GG --> HH[Complete Processing]
+    
+    %% Styling
+    classDef startEnd fill:#e8f5e8
+    classDef decision fill:#fff3e0
+    classDef process fill:#e1f5fe
+    classDef aiProvider fill:#f3e5f5
+    classDef error fill:#ffebee
+    classDef consensus fill:#e0f2f1
+    
+    class A,HH startEnd
+    class D,I1,I2,I3,I4,I5,I6,I7,I8,M1,M2,M3,M4,M5,M6,M7,M8,R decision
+    class B,C,F,G,P,Q,T,U,V,W,X,Y,Z,AA,BB,CC,DD,EE,FF,GG process
+    class H1,H2,H3,H4,H5,H6,H7,H8,J1,J2,J3,J4,J5,J6,J7,J8,L1,L2,L3,L4,L5,L6,L7,L8 aiProvider
+    class O1,O2,O3,O4,O5,O6,O7,O8 error
+    class N1,N2,N3,N4,N5,N6,N7,N8 consensus
+
