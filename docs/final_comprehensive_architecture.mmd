@@ -1,0 +1,350 @@
+graph TB
+    subgraph "Client Layer"
+        WEB[Web Browser]
+        MOBILE[Mobile Apps<br/>iOS/Android]
+        DESKTOP[Desktop Apps<br/>Windows/macOS/Linux]
+        API_CLIENT[API Clients]
+    end
+    
+    subgraph "Load Balancer & CDN"
+        CDN[CloudFlare CDN]
+        LB[Nginx Load Balancer]
+        SSL[SSL Termination]
+    end
+    
+    subgraph "Application Layer"
+        subgraph "Web Servers (PHP)"
+            WEB1[Web Server 1<br/>Apache + PHP 8.1]
+            WEB2[Web Server 2<br/>Apache + PHP 8.1]
+            WEB3[Web Server N<br/>Apache + PHP 8.1]
+        end
+        
+        subgraph "Real-time Services"
+            WS1[WebSocket Server 1<br/>Node.js]
+            WS2[WebSocket Server 2<br/>Node.js]
+            WS3[WebSocket Server N<br/>Node.js]
+        end
+        
+        subgraph "Background Workers"
+            WORKER1[Email Sync Worker]
+            WORKER2[AI Processing Worker]
+            WORKER3[Queue Worker]
+            SCHEDULER[Cron Scheduler]
+        end
+    end
+    
+    subgraph "AI Ensemble Layer"
+        subgraph "AI Providers (with Toggles)"
+            OPENAI[OpenAI GPT-4<br/>🔘 ON/OFF]
+            ANTHROPIC[Anthropic Claude<br/>🔘 ON/OFF]
+            GOOGLE[Google Gemini<br/>🔘 ON/OFF]
+            QWEN[Qwen Models<br/>🔘 ON/OFF]
+            GROQ[Groq Llama<br/>🔘 ON/OFF]
+            COHERE[Cohere Command<br/>🔘 ON/OFF]
+            MISTRAL[Mistral AI<br/>🔘 ON/OFF]
+            TOGETHER[Together AI<br/>🔘 ON/OFF]
+        end
+        
+        ENSEMBLE[Multi-AI Ensemble<br/>Weighted Consensus]
+    end
+    
+    subgraph "Email Provider Layer"
+        subgraph "Popular Providers"
+            GMAIL[Gmail IMAP/SMTP]
+            OUTLOOK[Outlook/Office365]
+            YAHOO[Yahoo Mail]
+            ICLOUD[iCloud Mail]
+        end
+        
+        subgraph "Privacy Providers"
+            PROTON[ProtonMail]
+            TUTANOTA[Tutanota]
+        end
+        
+        subgraph "Business Providers"
+            FASTMAIL[Fastmail]
+            ZOHO[Zoho Mail]
+            EXCHANGE[Exchange Server]
+        end
+        
+        subgraph "API Services"
+            MAILGUN[Mailgun API]
+            SENDGRID[SendGrid API]
+            SES[Amazon SES]
+            POSTMARK[Postmark API]
+        end
+        
+        subgraph "Custom Providers"
+            CUSTOM_IMAP[Custom IMAP]
+            CUSTOM_API[Custom API]
+        end
+    end
+    
+    subgraph "Data Layer"
+        subgraph "Primary Database"
+            DB_MASTER[MySQL Master<br/>Primary Database]
+            DB_SLAVE1[MySQL Slave 1<br/>Read Replica]
+            DB_SLAVE2[MySQL Slave 2<br/>Read Replica]
+        end
+        
+        subgraph "Cache Layer"
+            REDIS_MASTER[Redis Master<br/>Cache & Sessions]
+            REDIS_SLAVE[Redis Slave<br/>Backup Cache]
+        end
+        
+        subgraph "Search & Analytics"
+            ELASTICSEARCH[Elasticsearch<br/>Email Search]
+            ANALYTICS_DB[Analytics Database<br/>Time Series Data]
+        end
+    end
+    
+    subgraph "Storage Layer"
+        subgraph "File Storage"
+            LOCAL_STORAGE[Local File Storage<br/>Attachments]
+            S3[Amazon S3<br/>Backup Storage]
+            CDN_STORAGE[CDN Storage<br/>Static Assets]
+        end
+        
+        subgraph "Backup Systems"
+            DB_BACKUP[Database Backups<br/>Automated Daily]
+            FILE_BACKUP[File Backups<br/>Incremental]
+            DISASTER_RECOVERY[Disaster Recovery<br/>Cross-Region]
+        end
+    end
+    
+    subgraph "Monitoring & Observability"
+        subgraph "Metrics & Monitoring"
+            PROMETHEUS[Prometheus<br/>Metrics Collection]
+            GRAFANA[Grafana<br/>Dashboards]
+            ALERTMANAGER[Alert Manager<br/>Notifications]
+        end
+        
+        subgraph "Logging & Tracing"
+            ELK_STACK[ELK Stack<br/>Centralized Logging]
+            JAEGER[Jaeger<br/>Distributed Tracing]
+            APM[Application Performance<br/>Monitoring]
+        end
+        
+        subgraph "Health Checks"
+            HEALTH_CHECK[Health Check Service]
+            UPTIME_MONITOR[Uptime Monitoring]
+            SYNTHETIC_TESTS[Synthetic Testing]
+        end
+    end
+    
+    subgraph "Security Layer"
+        subgraph "Authentication & Authorization"
+            JWT[JWT Token Service]
+            OAUTH[OAuth 2.0 Provider]
+            MFA[Multi-Factor Auth]
+            RBAC[Role-Based Access]
+        end
+        
+        subgraph "Security Services"
+            WAF[Web Application Firewall]
+            RATE_LIMITER[Rate Limiting]
+            ENCRYPTION[AES-256 Encryption]
+            AUDIT_LOG[Audit Logging]
+        end
+        
+        subgraph "Compliance & Privacy"
+            GDPR[GDPR Compliance]
+            DATA_RETENTION[Data Retention Policies]
+            PRIVACY_CONTROLS[Privacy Controls]
+        end
+    end
+    
+    subgraph "DevOps & CI/CD"
+        subgraph "Source Control"
+            GITHUB[GitHub Repository]
+            GITHUB_ACTIONS[GitHub Actions<br/>CI/CD Pipeline]
+        end
+        
+        subgraph "Container Orchestration"
+            DOCKER[Docker Containers]
+            K8S[Kubernetes Cluster]
+            HELM[Helm Charts]
+        end
+        
+        subgraph "Infrastructure"
+            TERRAFORM[Terraform<br/>Infrastructure as Code]
+            ANSIBLE[Ansible<br/>Configuration Management]
+            VAULT[HashiCorp Vault<br/>Secrets Management]
+        end
+    end
+    
+    subgraph "External Integrations"
+        subgraph "Calendar Services"
+            GOOGLE_CAL[Google Calendar]
+            OUTLOOK_CAL[Outlook Calendar]
+            CALDAV[CalDAV Servers]
+        end
+        
+        subgraph "Productivity Tools"
+            SLACK[Slack Integration]
+            TEAMS[Microsoft Teams]
+            NOTION[Notion API]
+            DRIVE[Google Drive]
+        end
+        
+        subgraph "CRM Systems"
+            SALESFORCE[Salesforce]
+            HUBSPOT[HubSpot]
+            PIPEDRIVE[Pipedrive]
+        end
+    end
+    
+    %% Client Connections
+    WEB --> CDN
+    MOBILE --> CDN
+    DESKTOP --> CDN
+    API_CLIENT --> CDN
+    
+    %% Load Balancer Flow
+    CDN --> LB
+    LB --> SSL
+    SSL --> WEB1
+    SSL --> WEB2
+    SSL --> WEB3
+    
+    %% WebSocket Connections
+    WEB --> WS1
+    MOBILE --> WS1
+    DESKTOP --> WS1
+    WS1 --> WS2
+    WS2 --> WS3
+    
+    %% Application to AI
+    WEB1 --> ENSEMBLE
+    WEB2 --> ENSEMBLE
+    WEB3 --> ENSEMBLE
+    WORKER2 --> ENSEMBLE
+    
+    %% AI Ensemble to Providers
+    ENSEMBLE --> OPENAI
+    ENSEMBLE --> ANTHROPIC
+    ENSEMBLE --> GOOGLE
+    ENSEMBLE --> QWEN
+    ENSEMBLE --> GROQ
+    ENSEMBLE --> COHERE
+    ENSEMBLE --> MISTRAL
+    ENSEMBLE --> TOGETHER
+    
+    %% Email Provider Connections
+    WORKER1 --> GMAIL
+    WORKER1 --> OUTLOOK
+    WORKER1 --> YAHOO
+    WORKER1 --> ICLOUD
+    WORKER1 --> PROTON
+    WORKER1 --> TUTANOTA
+    WORKER1 --> FASTMAIL
+    WORKER1 --> ZOHO
+    WORKER1 --> EXCHANGE
+    WORKER1 --> MAILGUN
+    WORKER1 --> SENDGRID
+    WORKER1 --> SES
+    WORKER1 --> POSTMARK
+    WORKER1 --> CUSTOM_IMAP
+    WORKER1 --> CUSTOM_API
+    
+    %% Database Connections
+    WEB1 --> DB_MASTER
+    WEB2 --> DB_SLAVE1
+    WEB3 --> DB_SLAVE2
+    WORKER1 --> DB_MASTER
+    WORKER2 --> DB_MASTER
+    WORKER3 --> DB_MASTER
+    
+    %% Cache Connections
+    WEB1 --> REDIS_MASTER
+    WEB2 --> REDIS_MASTER
+    WEB3 --> REDIS_MASTER
+    WS1 --> REDIS_MASTER
+    WS2 --> REDIS_MASTER
+    WS3 --> REDIS_MASTER
+    
+    %% Replication
+    DB_MASTER --> DB_SLAVE1
+    DB_MASTER --> DB_SLAVE2
+    REDIS_MASTER --> REDIS_SLAVE
+    
+    %% Search & Analytics
+    WEB1 --> ELASTICSEARCH
+    WORKER2 --> ANALYTICS_DB
+    
+    %% Storage
+    WEB1 --> LOCAL_STORAGE
+    LOCAL_STORAGE --> S3
+    CDN --> CDN_STORAGE
+    
+    %% Backup
+    DB_MASTER --> DB_BACKUP
+    LOCAL_STORAGE --> FILE_BACKUP
+    DB_BACKUP --> DISASTER_RECOVERY
+    FILE_BACKUP --> DISASTER_RECOVERY
+    
+    %% Monitoring
+    WEB1 --> PROMETHEUS
+    WEB2 --> PROMETHEUS
+    WEB3 --> PROMETHEUS
+    WS1 --> PROMETHEUS
+    DB_MASTER --> PROMETHEUS
+    REDIS_MASTER --> PROMETHEUS
+    
+    PROMETHEUS --> GRAFANA
+    PROMETHEUS --> ALERTMANAGER
+    
+    %% Logging
+    WEB1 --> ELK_STACK
+    WS1 --> ELK_STACK
+    WORKER1 --> ELK_STACK
+    
+    %% Health Checks
+    HEALTH_CHECK --> WEB1
+    HEALTH_CHECK --> WS1
+    HEALTH_CHECK --> DB_MASTER
+    UPTIME_MONITOR --> LB
+    
+    %% Security
+    LB --> WAF
+    WEB1 --> JWT
+    WEB1 --> RATE_LIMITER
+    WEB1 --> ENCRYPTION
+    WEB1 --> AUDIT_LOG
+    
+    %% CI/CD
+    GITHUB --> GITHUB_ACTIONS
+    GITHUB_ACTIONS --> DOCKER
+    DOCKER --> K8S
+    
+    %% Infrastructure
+    K8S --> TERRAFORM
+    TERRAFORM --> ANSIBLE
+    ANSIBLE --> VAULT
+    
+    %% External Integrations
+    WEB1 --> GOOGLE_CAL
+    WEB1 --> OUTLOOK_CAL
+    WEB1 --> SLACK
+    WEB1 --> NOTION
+    WEB1 --> SALESFORCE
+    
+    %% Styling
+    classDef clientLayer fill:#e1f5fe
+    classDef appLayer fill:#f3e5f5
+    classDef aiLayer fill:#fff3e0
+    classDef emailLayer fill:#e8f5e8
+    classDef dataLayer fill:#fce4ec
+    classDef monitoringLayer fill:#f1f8e9
+    classDef securityLayer fill:#ffebee
+    classDef devopsLayer fill:#e0f2f1
+    
+    class WEB,MOBILE,DESKTOP,API_CLIENT clientLayer
+    class WEB1,WEB2,WEB3,WS1,WS2,WS3,WORKER1,WORKER2,WORKER3,SCHEDULER appLayer
+    class OPENAI,ANTHROPIC,GOOGLE,QWEN,GROQ,COHERE,MISTRAL,TOGETHER,ENSEMBLE aiLayer
+    class GMAIL,OUTLOOK,YAHOO,ICLOUD,PROTON,TUTANOTA,FASTMAIL,ZOHO,EXCHANGE,MAILGUN,SENDGRID,SES,POSTMARK,CUSTOM_IMAP,CUSTOM_API emailLayer
+    class DB_MASTER,DB_SLAVE1,DB_SLAVE2,REDIS_MASTER,REDIS_SLAVE,ELASTICSEARCH,ANALYTICS_DB dataLayer
+    class PROMETHEUS,GRAFANA,ALERTMANAGER,ELK_STACK,JAEGER,APM,HEALTH_CHECK,UPTIME_MONITOR,SYNTHETIC_TESTS monitoringLayer
+    class JWT,OAUTH,MFA,RBAC,WAF,RATE_LIMITER,ENCRYPTION,AUDIT_LOG,GDPR,DATA_RETENTION,PRIVACY_CONTROLS securityLayer
+    class GITHUB,GITHUB_ACTIONS,DOCKER,K8S,HELM,TERRAFORM,ANSIBLE,VAULT devopsLayer
+

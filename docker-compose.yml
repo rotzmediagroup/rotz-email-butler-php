@@ -1,0 +1,351 @@
+# ROTZ Email Butler - Docker Compose Configuration
+version: '3.8'
+
+services:
+  # Web Application (PHP)
+  web:
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+      target: ${BUILD_TARGET:-development}
+    container_name: rotz-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-80}:80"
+      - "${WEB_SSL_PORT:-443}:443"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/web/apache.conf:/etc/apache2/sites-available/000-default.conf
+      - ./docker/web/php.ini:/usr/local/etc/php/php.ini
+      - web_logs:/var/log/apache2
+      - uploads:/var/www/html/uploads
+    environment:
+      - PHP_ENV=${PHP_ENV:-development}
+      - DB_HOST=database
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-rotz_email_butler}
+      - DB_USER=${DB_USER:-rotz_user}
+      - DB_PASSWORD=${DB_PASSWORD:-rotz_password}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - WEBSOCKET_URL=ws://websocket:8080
+      - MAIL_ENCRYPTION_KEY=${MAIL_ENCRYPTION_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - database
+      - redis
+    networks:
+      - rotz-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # WebSocket Server (Node.js)
+  websocket:
+    build:
+      context: ./real-time
+      dockerfile: ../docker/websocket/Dockerfile
+    container_name: rotz-websocket
+    restart: unless-stopped
+    ports:
+      - "${WS_PORT:-8080}:8080"
+    volumes:
+      - ./real-time:/app
+      - ws_logs:/app/logs
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - WS_PORT=8080
+      - DB_HOST=database
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-rotz_email_butler}
+      - DB_USER=${DB_USER:-rotz_user}
+      - DB_PASSWORD=${DB_PASSWORD:-rotz_password}
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      - database
+      - redis
+    networks:
+      - rotz-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Database (MySQL)
+  database:
+    image: mysql:8.0
+    container_name: rotz-database
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker/database/my.cnf:/etc/mysql/conf.d/my.cnf
+      - db_logs:/var/log/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root_password}
+      - MYSQL_DATABASE=${DB_NAME:-rotz_email_butler}
+      - MYSQL_USER=${DB_USER:-rotz_user}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-rotz_password}
+    networks:
+      - rotz-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: rotz-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - rotz-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Load Balancer (Production)
+  nginx:
+    image: nginx:alpine
+    container_name: rotz-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/sites:/etc/nginx/conf.d
+      - ./docker/ssl:/etc/nginx/ssl
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - web
+      - websocket
+    networks:
+      - rotz-network
+    profiles:
+      - production
+
+  # Email Queue Worker
+  queue-worker:
+    build:
+      context: .
+      dockerfile: docker/worker/Dockerfile
+    container_name: rotz-queue-worker
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+      - worker_logs:/var/log/worker
+    environment:
+      - PHP_ENV=${PHP_ENV:-development}
+      - DB_HOST=database
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-rotz_email_butler}
+      - DB_USER=${DB_USER:-rotz_user}
+      - DB_PASSWORD=${DB_PASSWORD:-rotz_password}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - database
+      - redis
+    networks:
+      - rotz-network
+    command: php cron/queue_worker.php
+
+  # Email Sync Scheduler
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/scheduler/Dockerfile
+    container_name: rotz-scheduler
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+      - scheduler_logs:/var/log/scheduler
+    environment:
+      - PHP_ENV=${PHP_ENV:-development}
+      - DB_HOST=database
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-rotz_email_butler}
+      - DB_USER=${DB_USER:-rotz_user}
+      - DB_PASSWORD=${DB_PASSWORD:-rotz_password}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - database
+      - redis
+    networks:
+      - rotz-network
+
+  # Monitoring (Prometheus)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: rotz-prometheus
+    restart: unless-stopped
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./docker/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - rotz-network
+    profiles:
+      - monitoring
+
+  # Monitoring (Grafana)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: rotz-grafana
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./docker/monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    networks:
+      - rotz-network
+    profiles:
+      - monitoring
+
+  # Log Aggregation (ELK Stack)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: rotz-elasticsearch
+    restart: unless-stopped
+    ports:
+      - "${ELASTICSEARCH_PORT:-9200}:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    networks:
+      - rotz-network
+    profiles:
+      - logging
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: rotz-logstash
+    restart: unless-stopped
+    volumes:
+      - ./docker/logging/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - web_logs:/var/log/web
+      - ws_logs:/var/log/websocket
+      - db_logs:/var/log/database
+    depends_on:
+      - elasticsearch
+    networks:
+      - rotz-network
+    profiles:
+      - logging
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: rotz-kibana
+    restart: unless-stopped
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - rotz-network
+    profiles:
+      - logging
+
+  # Backup Service
+  backup:
+    build:
+      context: ./docker/backup
+      dockerfile: Dockerfile
+    container_name: rotz-backup
+    restart: unless-stopped
+    volumes:
+      - db_data:/backup/database
+      - uploads:/backup/uploads
+      - ./docker/backup/scripts:/scripts
+      - backup_storage:/backup/storage
+    environment:
+      - BACKUP_SCHEDULE=${BACKUP_SCHEDULE:-0 2 * * *}
+      - DB_HOST=database
+      - DB_NAME=${DB_NAME:-rotz_email_butler}
+      - DB_USER=${DB_USER:-rotz_user}
+      - DB_PASSWORD=${DB_PASSWORD:-rotz_password}
+      - S3_BUCKET=${S3_BACKUP_BUCKET}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+    depends_on:
+      - database
+    networks:
+      - rotz-network
+    profiles:
+      - backup
+
+# Networks
+networks:
+  rotz-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Volumes
+volumes:
+  db_data:
+    driver: local
+  redis_data:
+    driver: local
+  uploads:
+    driver: local
+  web_logs:
+    driver: local
+  ws_logs:
+    driver: local
+  db_logs:
+    driver: local
+  nginx_logs:
+    driver: local
+  worker_logs:
+    driver: local
+  scheduler_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+  backup_storage:
+    driver: local
+

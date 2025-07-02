@@ -1,0 +1,421 @@
+name: ROTZ Email Butler CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  release:
+    types: [ published ]
+
+env:
+  PHP_VERSION: '8.1'
+  NODE_VERSION: '18'
+  MYSQL_VERSION: '8.0'
+
+jobs:
+  # PHP Backend Testing
+  php-tests:
+    name: PHP Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: rotz_email_butler_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, filter, gd, iconv, json, mbstring, pdo, curl, imap
+        coverage: xdebug
+
+    - name: Get Composer Cache Directory
+      id: composer-cache
+      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+
+    - name: Install Composer dependencies
+      run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+    - name: Create test environment file
+      run: |
+        cp .env.example .env.testing
+        echo "DB_HOST=127.0.0.1" >> .env.testing
+        echo "DB_PORT=3306" >> .env.testing
+        echo "DB_DATABASE=rotz_email_butler_test" >> .env.testing
+        echo "DB_USERNAME=root" >> .env.testing
+        echo "DB_PASSWORD=root" >> .env.testing
+        echo "REDIS_HOST=127.0.0.1" >> .env.testing
+        echo "REDIS_PORT=6379" >> .env.testing
+
+    - name: Wait for MySQL
+      run: |
+        while ! mysqladmin ping -h"127.0.0.1" -P"3306" -uroot -proot --silent; do
+          sleep 1
+        done
+
+    - name: Setup test database
+      run: |
+        mysql -h 127.0.0.1 -P 3306 -u root -proot -e "CREATE DATABASE IF NOT EXISTS rotz_email_butler_test;"
+        php setup/database/migrate.php --env=testing
+
+    - name: Run PHP Unit Tests
+      run: |
+        vendor/bin/phpunit --configuration phpunit.xml --coverage-clover coverage.xml
+
+    - name: Run PHP Static Analysis
+      run: |
+        vendor/bin/phpstan analyse --level=7 classes/ api/ setup/
+
+    - name: Run PHP Code Style Check
+      run: |
+        vendor/bin/php-cs-fixer fix --dry-run --diff --verbose
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: php
+        name: php-coverage
+
+  # Node.js WebSocket Server Testing
+  websocket-tests:
+    name: WebSocket Server Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: rotz_email_butler_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: real-time/package-lock.json
+
+    - name: Install WebSocket dependencies
+      working-directory: ./real-time
+      run: npm ci
+
+    - name: Create test environment
+      working-directory: ./real-time
+      run: |
+        echo "NODE_ENV=test" > .env.test
+        echo "DB_HOST=127.0.0.1" >> .env.test
+        echo "DB_PORT=3306" >> .env.test
+        echo "DB_NAME=rotz_email_butler_test" >> .env.test
+        echo "DB_USER=root" >> .env.test
+        echo "DB_PASSWORD=root" >> .env.test
+        echo "REDIS_URL=redis://127.0.0.1:6379" >> .env.test
+        echo "JWT_SECRET=test-secret-key" >> .env.test
+        echo "WS_PORT=8081" >> .env.test
+
+    - name: Run WebSocket tests
+      working-directory: ./real-time
+      run: npm test
+
+    - name: Run WebSocket linting
+      working-directory: ./real-time
+      run: npm run lint
+
+  # React Native Mobile App Testing
+  mobile-tests:
+    name: Mobile App Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: mobile/react-native/package-lock.json
+
+    - name: Install mobile dependencies
+      working-directory: ./mobile/react-native
+      run: npm ci
+
+    - name: Run mobile tests
+      working-directory: ./mobile/react-native
+      run: npm test
+
+    - name: Run mobile linting
+      working-directory: ./mobile/react-native
+      run: npm run lint
+
+    - name: Type checking
+      working-directory: ./mobile/react-native
+      run: npx tsc --noEmit
+
+  # Electron Desktop App Testing
+  desktop-tests:
+    name: Desktop App Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: desktop/electron/package-lock.json
+
+    - name: Install desktop dependencies
+      working-directory: ./desktop/electron
+      run: npm ci
+
+    - name: Run desktop tests
+      working-directory: ./desktop/electron
+      run: npm test
+
+    - name: Run desktop linting
+      working-directory: ./desktop/electron
+      run: npm run lint
+
+  # Security Scanning
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    needs: [php-tests, websocket-tests]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: PHP Security Checker
+      run: |
+        composer install --no-dev
+        vendor/bin/security-checker security:check composer.lock
+
+    - name: Node.js Security Audit
+      working-directory: ./real-time
+      run: npm audit --audit-level high
+
+  # Build and Package
+  build:
+    name: Build Applications
+    runs-on: ubuntu-latest
+    needs: [php-tests, websocket-tests, mobile-tests, desktop-tests]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, filter, gd, iconv, json, mbstring, pdo, curl, imap
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Build PHP application
+      run: |
+        composer install --no-dev --optimize-autoloader
+        php setup/build/optimize.php
+
+    - name: Build WebSocket server
+      working-directory: ./real-time
+      run: |
+        npm ci --production
+        npm run build
+
+    - name: Build mobile app (Android)
+      working-directory: ./mobile/react-native
+      run: |
+        npm ci
+        npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle
+
+    - name: Package applications
+      run: |
+        mkdir -p dist
+        tar -czf dist/rotz-email-butler-web.tar.gz --exclude=node_modules --exclude=.git .
+        tar -czf dist/rotz-email-butler-websocket.tar.gz -C real-time --exclude=node_modules .
+        tar -czf dist/rotz-email-butler-mobile.tar.gz -C mobile/react-native --exclude=node_modules .
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: rotz-email-butler-builds
+        path: dist/
+
+  # Deploy to Staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    environment: staging
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: rotz-email-butler-builds
+        path: dist/
+
+    - name: Deploy to staging server
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USER }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        script: |
+          cd /var/www/staging
+          wget ${{ secrets.STAGING_DOWNLOAD_URL }}/rotz-email-butler-web.tar.gz
+          tar -xzf rotz-email-butler-web.tar.gz
+          php setup/deploy/staging.php
+          sudo systemctl restart apache2
+          sudo systemctl restart rotz-websocket
+
+    - name: Run staging tests
+      run: |
+        curl -f ${{ secrets.STAGING_URL }}/health || exit 1
+        curl -f ${{ secrets.STAGING_WS_URL }}/health || exit 1
+
+  # Deploy to Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.event_name == 'release' && github.event.action == 'published'
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: rotz-email-butler-builds
+        path: dist/
+
+    - name: Deploy to production server
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.PRODUCTION_HOST }}
+        username: ${{ secrets.PRODUCTION_USER }}
+        key: ${{ secrets.PRODUCTION_SSH_KEY }}
+        script: |
+          cd /var/www/production
+          wget ${{ secrets.PRODUCTION_DOWNLOAD_URL }}/rotz-email-butler-web.tar.gz
+          tar -xzf rotz-email-butler-web.tar.gz
+          php setup/deploy/production.php
+          sudo systemctl restart apache2
+          sudo systemctl restart rotz-websocket
+
+    - name: Run production health checks
+      run: |
+        curl -f ${{ secrets.PRODUCTION_URL }}/health || exit 1
+        curl -f ${{ secrets.PRODUCTION_WS_URL }}/health || exit 1
+
+    - name: Notify deployment success
+      uses: 8398a7/action-slack@v3
+      with:
+        status: success
+        text: 'ROTZ Email Butler successfully deployed to production!'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+  # Performance Testing
+  performance-tests:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+    needs: [deploy-staging]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install k6
+      run: |
+        sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+        echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo apt-get update
+        sudo apt-get install k6
+
+    - name: Run performance tests
+      run: |
+        k6 run tests/performance/load-test.js
+        k6 run tests/performance/stress-test.js
+        k6 run tests/performance/websocket-test.js
+
+    - name: Upload performance results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-results
+        path: tests/performance/results/
+
