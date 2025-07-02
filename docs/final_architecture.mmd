@@ -1,0 +1,275 @@
+graph TB
+    subgraph "Frontend Layer"
+        UI[Web Interface<br/>Responsive HTML5 + CSS3 + JavaScript]
+        LOGIN[Login/Registration System<br/>Session Management]
+        DASH[Real-time Dashboard<br/>Statistics & Monitoring]
+        MODALS[Dynamic Modal System<br/>AI Provider & Email Setup]
+        TOGGLES[Enable/Disable Toggles<br/>Individual AI Model Control]
+    end
+    
+    subgraph "Application Layer"
+        ROUTER[PHP Router<br/>index.php - Main Entry Point]
+        SETUP[WordPress-style Setup Wizard<br/>5-Step Installation Process]
+        API[REST API System<br/>Comprehensive JSON Endpoints]
+        MIDDLEWARE[Security Middleware<br/>Auth, CORS, Rate Limiting, CSRF]
+        CRON[Automated Cron Jobs<br/>Email Processing & Sync]
+    end
+    
+    subgraph "Multi-AI Ensemble Engine"
+        ENSEMBLE[MultiAIEnsemble Class<br/>Weighted Consensus Algorithm]
+        
+        subgraph "AI Providers with Individual Toggles"
+            OPENAI[OpenAI Provider ⚡<br/>GPT-4, GPT-3.5-turbo<br/>Toggle: ON/OFF]
+            ANTHROPIC[Anthropic Provider ⚡<br/>Claude 3.5 Sonnet, Haiku<br/>Toggle: ON/OFF]
+            GOOGLE[Google Provider ⚡<br/>Gemini Pro, Ultra, Flash<br/>Toggle: ON/OFF]
+            QWEN[Qwen Provider ⚡<br/>Qwen2.5-Max, QVQ-72B<br/>Toggle: ON/OFF]
+            GROQ[Groq Provider ⚡<br/>Llama 3.1, Mixtral<br/>Toggle: ON/OFF]
+            COHERE[Cohere Provider ⚡<br/>Command R+, Command R<br/>Toggle: ON/OFF]
+            MISTRAL[Mistral Provider ⚡<br/>Large, Medium, Small<br/>Toggle: ON/OFF]
+            TOGETHER[Together AI ⚡<br/>Open-source Models<br/>Toggle: ON/OFF]
+        end
+        
+        CONSENSUS[Consensus Algorithm<br/>Weighted Voting System]
+        COST_TRACK[Cost Tracking<br/>API Usage Monitoring]
+        PERF_MON[Performance Monitor<br/>Response Time & Accuracy]
+    end
+    
+    subgraph "Email Processing Engine"
+        EMAIL_PROC[Email Processor<br/>Multi-AI Analysis Pipeline]
+        CATEGORIZER[Smart Categorizer<br/>Work, Personal, Marketing, Finance]
+        PRIORITY[Priority Detector<br/>High, Medium, Low Priority]
+        SENTIMENT[Sentiment Analyzer<br/>Positive, Negative, Neutral]
+        FOLLOW_UP[Follow-up Engine<br/>Automated Reminders]
+        SUMMARY[AI Summary Generator<br/>Email Content Analysis]
+    end
+    
+    subgraph "Comprehensive Email Provider System"
+        EMAIL_MGR[EmailProvider Class<br/>Universal Email Interface]
+        
+        subgraph "Popular Providers"
+            GMAIL[Gmail IMAP/OAuth2<br/>App Password Support]
+            OUTLOOK[Outlook/Office 365<br/>Modern Auth Integration]
+            YAHOO[Yahoo Mail IMAP<br/>App Password Support]
+            ICLOUD[iCloud Mail<br/>App-specific Passwords]
+        end
+        
+        subgraph "Privacy-Focused Providers"
+            PROTON[ProtonMail<br/>Bridge Integration]
+            TUTANOTA[Tutanota<br/>Secure Email Access]
+        end
+        
+        subgraph "Business Providers"
+            FASTMAIL[Fastmail<br/>Business Email Solution]
+            ZOHO[Zoho Mail<br/>Enterprise Integration]
+        end
+        
+        subgraph "International Providers"
+            AOL[AOL Mail<br/>Legacy Support]
+            YANDEX[Yandex Mail<br/>Russian Email Service]
+            GMX[GMX Mail<br/>German Email Provider]
+            MAILCOM[Mail.com<br/>International Service]
+        end
+        
+        subgraph "API Services"
+            MAILGUN[Mailgun API<br/>Sending Service]
+            SENDGRID[SendGrid API<br/>Email Delivery Platform]
+            SES[Amazon SES<br/>AWS Email Service]
+            POSTMARK[Postmark API<br/>Transactional Email]
+            MANDRILL[Mandrill API<br/>MailChimp Service]
+            SPARKPOST[SparkPost API<br/>Email Delivery]
+        end
+        
+        subgraph "Custom Configurations"
+            CUSTOM_IMAP[Custom IMAP<br/>Any IMAP Server]
+            CUSTOM_EXCHANGE[Custom Exchange<br/>Microsoft Exchange]
+            CUSTOM_API[Custom API<br/>Proprietary Systems]
+        end
+    end
+    
+    subgraph "Data Layer"
+        DB[(MySQL Database<br/>11 Production Tables)]
+        
+        subgraph "Database Tables"
+            USERS[users<br/>User Accounts & Auth]
+            EMAIL_ACCOUNTS[email_accounts<br/>Connected Email Accounts]
+            EMAILS[emails<br/>Processed Email Data]
+            AI_PROVIDERS[ai_providers<br/>AI Provider Configs]
+            FOLLOW_UPS[follow_ups<br/>Automated Reminders]
+            ACTIVITY_LOGS[activity_logs<br/>Audit Trail]
+            SETTINGS[settings<br/>System Configuration]
+            SESSIONS[sessions<br/>User Sessions]
+            RATE_LIMITS[rate_limits<br/>API Rate Limiting]
+            EMAIL_RULES[email_rules<br/>Custom Rules]
+            INTEGRATIONS[integrations<br/>Third-party Integrations]
+        end
+        
+        ENCRYPTION[AES-256 Encryption<br/>Credential Protection]
+        LOGGING[Activity Logging<br/>Complete Audit Trail]
+        BACKUP[Automated Backups<br/>Data Protection]
+    end
+    
+    subgraph "Security Layer"
+        BCRYPT[Password Hashing<br/>bcrypt Algorithm]
+        SESSION_MGR[Session Management<br/>Secure Cookie Handling]
+        CSRF[CSRF Protection<br/>Token Validation]
+        RATE_LIMIT[Rate Limiting<br/>API Abuse Prevention]
+        INPUT_VAL[Input Validation<br/>XSS & SQL Injection Prevention]
+        ENCRYPTION_SVC[Encryption Service<br/>Data Protection]
+        AUDIT[Security Auditing<br/>Threat Detection]
+    end
+    
+    subgraph "Admin Control Panel"
+        ADMIN_PANEL[Admin Dashboard<br/>System Management]
+        USER_MGR[User Management<br/>Registration Control Toggle]
+        AI_TOGGLES[AI Provider Toggles<br/>Individual Model Control]
+        ANALYTICS[Analytics Dashboard<br/>Performance Insights]
+        SYSTEM_HEALTH[System Health Monitor<br/>Real-time Status]
+        REG_CONTROL[Registration Control<br/>Enable/Disable New Users]
+        BULK_OPS[Bulk Operations<br/>Mass AI Provider Management]
+    end
+    
+    subgraph "External Services"
+        AI_APIS[AI Provider APIs<br/>Real API Connections]
+        EMAIL_SERVERS[Email Servers<br/>IMAP/SMTP/API Connections]
+        OAUTH[OAuth Providers<br/>Google, Microsoft, etc.]
+        WEBHOOKS[Webhook Endpoints<br/>Real-time Notifications]
+    end
+    
+    subgraph "Automation & Monitoring"
+        CRON_SYNC[Email Sync Cron<br/>Every 15 Minutes]
+        CRON_PROCESS[AI Processing Cron<br/>Automated Analysis]
+        HEALTH_CHECK[Health Monitoring<br/>System Status Checks]
+        ALERTS[Alert System<br/>Error Notifications]
+        METRICS[Metrics Collection<br/>Performance Data]
+    end
+    
+    %% User Interface Flow
+    UI --> ROUTER
+    LOGIN --> ROUTER
+    DASH --> API
+    MODALS --> API
+    TOGGLES --> API
+    
+    %% Application Flow
+    ROUTER --> SETUP
+    ROUTER --> API
+    API --> MIDDLEWARE
+    MIDDLEWARE --> EMAIL_PROC
+    MIDDLEWARE --> EMAIL_MGR
+    MIDDLEWARE --> ENSEMBLE
+    
+    %% Multi-AI Ensemble Flow
+    EMAIL_PROC --> ENSEMBLE
+    ENSEMBLE --> OPENAI
+    ENSEMBLE --> ANTHROPIC
+    ENSEMBLE --> GOOGLE
+    ENSEMBLE --> QWEN
+    ENSEMBLE --> GROQ
+    ENSEMBLE --> COHERE
+    ENSEMBLE --> MISTRAL
+    ENSEMBLE --> TOGETHER
+    
+    ENSEMBLE --> CONSENSUS
+    ENSEMBLE --> COST_TRACK
+    ENSEMBLE --> PERF_MON
+    
+    %% Email Processing Flow
+    EMAIL_PROC --> CATEGORIZER
+    EMAIL_PROC --> PRIORITY
+    EMAIL_PROC --> SENTIMENT
+    EMAIL_PROC --> FOLLOW_UP
+    EMAIL_PROC --> SUMMARY
+    
+    %% Email Provider Flow
+    EMAIL_MGR --> GMAIL
+    EMAIL_MGR --> OUTLOOK
+    EMAIL_MGR --> YAHOO
+    EMAIL_MGR --> ICLOUD
+    EMAIL_MGR --> PROTON
+    EMAIL_MGR --> TUTANOTA
+    EMAIL_MGR --> FASTMAIL
+    EMAIL_MGR --> ZOHO
+    EMAIL_MGR --> AOL
+    EMAIL_MGR --> YANDEX
+    EMAIL_MGR --> GMX
+    EMAIL_MGR --> MAILCOM
+    EMAIL_MGR --> MAILGUN
+    EMAIL_MGR --> SENDGRID
+    EMAIL_MGR --> SES
+    EMAIL_MGR --> POSTMARK
+    EMAIL_MGR --> MANDRILL
+    EMAIL_MGR --> SPARKPOST
+    EMAIL_MGR --> CUSTOM_IMAP
+    EMAIL_MGR --> CUSTOM_EXCHANGE
+    EMAIL_MGR --> CUSTOM_API
+    
+    %% Database Flow
+    API --> DB
+    EMAIL_PROC --> DB
+    EMAIL_MGR --> DB
+    ENSEMBLE --> DB
+    CRON --> DB
+    
+    DB --> USERS
+    DB --> EMAIL_ACCOUNTS
+    DB --> EMAILS
+    DB --> AI_PROVIDERS
+    DB --> FOLLOW_UPS
+    DB --> ACTIVITY_LOGS
+    DB --> SETTINGS
+    DB --> SESSIONS
+    DB --> RATE_LIMITS
+    DB --> EMAIL_RULES
+    DB --> INTEGRATIONS
+    
+    DB --> ENCRYPTION
+    DB --> LOGGING
+    DB --> BACKUP
+    
+    %% Security Flow
+    ROUTER --> BCRYPT
+    ROUTER --> SESSION_MGR
+    API --> CSRF
+    API --> RATE_LIMIT
+    API --> INPUT_VAL
+    DB --> ENCRYPTION_SVC
+    MIDDLEWARE --> AUDIT
+    
+    %% Admin Flow
+    ADMIN_PANEL --> USER_MGR
+    ADMIN_PANEL --> AI_TOGGLES
+    ADMIN_PANEL --> ANALYTICS
+    ADMIN_PANEL --> SYSTEM_HEALTH
+    ADMIN_PANEL --> REG_CONTROL
+    ADMIN_PANEL --> BULK_OPS
+    
+    %% External Connections
+    ENSEMBLE --> AI_APIS
+    EMAIL_MGR --> EMAIL_SERVERS
+    LOGIN --> OAUTH
+    API --> WEBHOOKS
+    
+    %% Automation Flow
+    CRON --> CRON_SYNC
+    CRON --> CRON_PROCESS
+    CRON --> HEALTH_CHECK
+    CRON --> ALERTS
+    CRON --> METRICS
+    
+    %% Styling
+    classDef aiProvider fill:#e1f5fe,stroke:#0277bd,stroke-width:3px
+    classDef emailProvider fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef security fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef database fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef admin fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    classDef automation fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
+    classDef toggle fill:#fce4ec,stroke:#ad1457,stroke-width:3px
+    
+    class OPENAI,ANTHROPIC,GOOGLE,QWEN,GROQ,COHERE,MISTRAL,TOGETHER,ENSEMBLE,CONSENSUS aiProvider
+    class GMAIL,OUTLOOK,YAHOO,ICLOUD,PROTON,TUTANOTA,FASTMAIL,ZOHO,AOL,YANDEX,GMX,MAILCOM,MAILGUN,SENDGRID,SES,POSTMARK,MANDRILL,SPARKPOST,CUSTOM_IMAP,CUSTOM_EXCHANGE,CUSTOM_API emailProvider
+    class BCRYPT,SESSION_MGR,CSRF,RATE_LIMIT,INPUT_VAL,ENCRYPTION,ENCRYPTION_SVC,AUDIT security
+    class DB,USERS,EMAIL_ACCOUNTS,EMAILS,AI_PROVIDERS,FOLLOW_UPS,ACTIVITY_LOGS,SETTINGS,SESSIONS,RATE_LIMITS,EMAIL_RULES,INTEGRATIONS,LOGGING,BACKUP database
+    class ADMIN_PANEL,USER_MGR,AI_TOGGLES,ANALYTICS,SYSTEM_HEALTH,REG_CONTROL,BULK_OPS admin
+    class CRON,CRON_SYNC,CRON_PROCESS,HEALTH_CHECK,ALERTS,METRICS automation
+    class TOGGLES toggle
+
