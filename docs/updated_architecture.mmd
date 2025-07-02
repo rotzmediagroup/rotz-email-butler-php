@@ -1,0 +1,160 @@
+graph TB
+    subgraph "User Interface Layer"
+        UI[Web Interface<br/>HTML5 + CSS3 + JavaScript]
+        AUTH[Authentication System<br/>Login/Register/Session Management]
+        DASH[Dashboard<br/>Real-time Stats & Monitoring]
+        MODALS[Modal System<br/>AI Provider & Email Account Setup]
+    end
+    
+    subgraph "Application Layer"
+        ROUTER[PHP Router<br/>index.php - Main Entry Point]
+        SETUP[Setup Wizard<br/>WordPress-style Installation]
+        API[REST API Endpoints<br/>JSON Response System]
+        MIDDLEWARE[Middleware<br/>Auth, CORS, Rate Limiting]
+    end
+    
+    subgraph "Business Logic Layer"
+        subgraph "Multi-AI Ensemble System"
+            ENSEMBLE[MultiAIEnsemble Class<br/>Weighted Consensus Algorithm]
+            OPENAI[OpenAI Provider<br/>GPT-4, GPT-3.5-turbo]
+            ANTHROPIC[Anthropic Provider<br/>Claude 3.5 Sonnet, Haiku]
+            GOOGLE[Google Provider<br/>Gemini Pro, Ultra, Flash]
+            QWEN[Qwen Provider<br/>Qwen2.5-Max, QVQ-72B]
+            GROQ[Groq Provider<br/>Llama 3.1, Mixtral]
+            COHERE[Cohere Provider<br/>Command R+, Command R]
+            MISTRAL[Mistral Provider<br/>Large, Medium, Small]
+            TOGETHER[Together AI<br/>Open-source Models]
+        end
+        
+        subgraph "Email Processing Engine"
+            EMAIL_PROC[Email Processor<br/>Multi-AI Analysis Pipeline]
+            CATEGORIZER[Smart Categorizer<br/>Work, Personal, Marketing, Finance]
+            PRIORITY[Priority Detector<br/>High, Medium, Low Priority]
+            SENTIMENT[Sentiment Analyzer<br/>Positive, Negative, Neutral]
+            FOLLOW_UP[Follow-up Engine<br/>Automated Reminders]
+        end
+        
+        subgraph "Email Provider System"
+            EMAIL_MGR[EmailProvider Class<br/>Universal Email Interface]
+            IMAP_GMAIL[Gmail IMAP<br/>OAuth2 + App Passwords]
+            IMAP_OUTLOOK[Outlook IMAP<br/>Office 365 Integration]
+            IMAP_YAHOO[Yahoo IMAP<br/>App Password Support]
+            IMAP_ICLOUD[iCloud IMAP<br/>App-specific Passwords]
+            IMAP_PROTON[ProtonMail<br/>Bridge Integration]
+            IMAP_CUSTOM[Custom IMAP<br/>Any IMAP Server]
+            API_MAILGUN[Mailgun API<br/>Sending Service]
+            API_SENDGRID[SendGrid API<br/>Email Delivery]
+            API_SES[Amazon SES<br/>AWS Integration]
+        end
+    end
+    
+    subgraph "Data Layer"
+        DB[(MySQL Database<br/>11 Tables with Relationships)]
+        ENCRYPTION[AES-256 Encryption<br/>Secure Credential Storage]
+        LOGGING[Activity Logging<br/>Audit Trail System]
+        SETTINGS[Settings Manager<br/>Configuration Storage]
+    end
+    
+    subgraph "Security Layer"
+        BCRYPT[Password Hashing<br/>bcrypt Algorithm]
+        SESSION[Session Management<br/>Secure Cookie Handling]
+        CSRF[CSRF Protection<br/>Token Validation]
+        RATE_LIMIT[Rate Limiting<br/>API Abuse Prevention]
+        INPUT_VAL[Input Validation<br/>XSS & SQL Injection Prevention]
+    end
+    
+    subgraph "External Services"
+        AI_APIS[AI Provider APIs<br/>OpenAI, Anthropic, Google, etc.]
+        EMAIL_SERVERS[Email Servers<br/>IMAP/SMTP Connections]
+        OAUTH[OAuth Providers<br/>Google, Microsoft, etc.]
+    end
+    
+    subgraph "Admin Features"
+        ADMIN_PANEL[Admin Panel<br/>System Configuration]
+        USER_MGR[User Management<br/>Registration Control]
+        AI_TOGGLES[AI Provider Toggles<br/>Enable/Disable Models]
+        ANALYTICS[Analytics Dashboard<br/>Performance Monitoring]
+        SYSTEM_HEALTH[System Health<br/>Status Monitoring]
+    end
+    
+    %% User Flow
+    UI --> ROUTER
+    AUTH --> ROUTER
+    DASH --> API
+    MODALS --> API
+    
+    %% Application Flow
+    ROUTER --> SETUP
+    ROUTER --> API
+    API --> MIDDLEWARE
+    MIDDLEWARE --> EMAIL_PROC
+    MIDDLEWARE --> EMAIL_MGR
+    MIDDLEWARE --> ENSEMBLE
+    
+    %% AI Processing Flow
+    EMAIL_PROC --> ENSEMBLE
+    ENSEMBLE --> OPENAI
+    ENSEMBLE --> ANTHROPIC
+    ENSEMBLE --> GOOGLE
+    ENSEMBLE --> QWEN
+    ENSEMBLE --> GROQ
+    ENSEMBLE --> COHERE
+    ENSEMBLE --> MISTRAL
+    ENSEMBLE --> TOGETHER
+    
+    EMAIL_PROC --> CATEGORIZER
+    EMAIL_PROC --> PRIORITY
+    EMAIL_PROC --> SENTIMENT
+    EMAIL_PROC --> FOLLOW_UP
+    
+    %% Email Provider Flow
+    EMAIL_MGR --> IMAP_GMAIL
+    EMAIL_MGR --> IMAP_OUTLOOK
+    EMAIL_MGR --> IMAP_YAHOO
+    EMAIL_MGR --> IMAP_ICLOUD
+    EMAIL_MGR --> IMAP_PROTON
+    EMAIL_MGR --> IMAP_CUSTOM
+    EMAIL_MGR --> API_MAILGUN
+    EMAIL_MGR --> API_SENDGRID
+    EMAIL_MGR --> API_SES
+    
+    %% Data Flow
+    API --> DB
+    EMAIL_PROC --> DB
+    EMAIL_MGR --> DB
+    ENSEMBLE --> DB
+    DB --> ENCRYPTION
+    DB --> LOGGING
+    DB --> SETTINGS
+    
+    %% Security Flow
+    ROUTER --> BCRYPT
+    ROUTER --> SESSION
+    API --> CSRF
+    API --> RATE_LIMIT
+    API --> INPUT_VAL
+    
+    %% External Connections
+    ENSEMBLE --> AI_APIS
+    EMAIL_MGR --> EMAIL_SERVERS
+    AUTH --> OAUTH
+    
+    %% Admin Flow
+    ADMIN_PANEL --> USER_MGR
+    ADMIN_PANEL --> AI_TOGGLES
+    ADMIN_PANEL --> ANALYTICS
+    ADMIN_PANEL --> SYSTEM_HEALTH
+    
+    %% Styling
+    classDef aiProvider fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef emailProvider fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef security fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef database fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef admin fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    
+    class OPENAI,ANTHROPIC,GOOGLE,QWEN,GROQ,COHERE,MISTRAL,TOGETHER aiProvider
+    class IMAP_GMAIL,IMAP_OUTLOOK,IMAP_YAHOO,IMAP_ICLOUD,IMAP_PROTON,IMAP_CUSTOM,API_MAILGUN,API_SENDGRID,API_SES emailProvider
+    class BCRYPT,SESSION,CSRF,RATE_LIMIT,INPUT_VAL,ENCRYPTION security
+    class DB,LOGGING,SETTINGS database
+    class ADMIN_PANEL,USER_MGR,AI_TOGGLES,ANALYTICS,SYSTEM_HEALTH admin
+
