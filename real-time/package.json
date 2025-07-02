@@ -1,0 +1,54 @@
+{
+  "name": "rotz-email-butler-websocket",
+  "version": "1.0.0",
+  "description": "ROTZ Email Butler - Real-time WebSocket Server",
+  "main": "websocket-server.js",
+  "scripts": {
+    "start": "node websocket-server.js",
+    "dev": "nodemon websocket-server.js",
+    "test": "jest",
+    "lint": "eslint .",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop ecosystem.config.js",
+    "pm2:restart": "pm2 restart ecosystem.config.js",
+    "pm2:logs": "pm2 logs rotz-websocket"
+  },
+  "dependencies": {
+    "ws": "^8.14.2",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.6.5",
+    "redis": "^4.6.10",
+    "uuid": "^9.0.1",
+    "dotenv": "^16.3.1",
+    "helmet": "^7.1.0",
+    "rate-limiter-flexible": "^2.4.2",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "eslint": "^8.55.0",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "websocket",
+    "real-time",
+    "email",
+    "ai",
+    "rotz",
+    "butler"
+  ],
+  "author": "ROTZ Media Group",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rotzmediagroup/rotz-email-butler-php.git"
+  }
+}
+
